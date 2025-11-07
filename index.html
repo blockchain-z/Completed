@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>📘 作業繳交統計表生成器</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+body {
+  font-family: "Microsoft JhengHei", sans-serif;
+  background: linear-gradient(to bottom right, #e8f0fe, #f8fbff);
+  padding: 40px;
+  color: #333;
+  text-align: center;
+}
+h1 { color: #1976d2; margin-bottom: 10px; }
+h3 { color: #1565c0; margin-top: 30px; }
+button, input[type="file"], textarea {
+  padding: 8px 14px;
+  margin: 6px 4px;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+button, input[type="file"] {
+  border: none;
+  background: #1976d2;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+button:hover, input[type="file"]:hover {
+  background: #0f56a0;
+  transform: scale(1.03);
+}
+textarea {
+  width: 70%;
+  height: 60px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  resize: vertical;
+  padding: 6px;
+  font-family: "Microsoft JhengHei";
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+table {
+  border-collapse: collapse;
+  margin: 25px auto;
+  background: white;
+  width: 85%;
+  max-width: 900px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+th {
+  background: #f1f5fb;
+  color: #1976d2;
+  font-weight: bold;
+}
+tr:hover td { background: #f9fbff; }
+#status { margin-top: 12px; color: #444; font-weight: 500; }
+#output { margin-top: 15px; overflow-x: auto; }
+.hidden { display: none; }
+#exportExcel {
+  background: #43a047;
+}
+#exportExcel:hover {
+  background: #2e7d32;
+}
+</style>
+</head>
+<body>
+
+<h1>📘 作業繳交統計表</h1>
+<p>輸入學號 → 上傳班級資料夾 → 匯出 Excel</p>
+
+<h3>第 1 步：輸入學生學號</h3>
+<textarea id="studentInput" placeholder="例：11110134,11207340 11410101 11410102"></textarea><br>
+<button id="confirmStudents">✅ 確認學號</button>
+<p id="studentCount"></p>
+
+<h3 class="hidden" id="step2">第 2 步：上傳班級資料夾</h3>
+<input type="file" id="classFolderInput" webkitdirectory class="hidden">
+<button id="exportExcel" class="hidden">📊 下載 Excel 統計表</button>
+
+<div id="status"></div>
+<div id="output"></div>
+
+<script>
+let studentIDs = [];
+const data = {};
+
+document.getElementById("confirmStudents").addEventListener("click", () => {
+  const text = document.getElementById("studentInput").value.trim();
+  if (!text) { alert("請輸入至少一個學號。"); return; }
+
+  studentIDs = text.split(/[\s,;]+/).map(s => s.trim()).filter(Boolean);
+  studentIDs = [...new Set(studentIDs)];
+  if (studentIDs.length === 0) { alert("⚠️ 未解析到任何學號。"); return; }
+
+  document.getElementById("studentCount").innerText = `✅ 已輸入 ${studentIDs.length} 位學生`;
+  document.getElementById("step2").classList.remove("hidden");
+  document.getElementById("classFolderInput").classList.remove("hidden");
+});
+
+document.getElementById("classFolderInput").addEventListener("change", (e) => {
+  const files = Array.from(e.target.files);
+  if (files.length === 0) return;
+
+  // ✅ 自動偵測資料夾階層，只抓取子資料夾，不包含根目錄檔案
+  files.forEach(file => {
+    const pathParts = file.webkitRelativePath.split("/");
+    if (pathParts.length < 2) return; // 忽略根目錄檔案
+    if (pathParts[1].includes(".")) return; // 如果第二層有副檔名（非資料夾）也忽略
+    const folderName = pathParts[1]; // 第二層為作業資料夾名
+    const fileName = file.name.split(".")[0];
+    if (!data[folderName]) data[folderName] = new Set();
+    data[folderName].add(fileName);
+  });
+
+  document.getElementById("status").innerText =
+    `✅ 已讀取 ${Object.keys(data).length} 個作業資料夾`;
+  updatePreview();
+});
+
+function updatePreview() {
+  const sortedFolders = Object.keys(data).sort();
+  const sortedIDs = [...studentIDs].sort();
+
+  let html = "<table><tr><th>學號</th>";
+  sortedFolders.forEach(f => html += `<th>${f}</th>`);
+  html += "</tr>";
+
+  const outputData = [];
+  sortedIDs.forEach(id => {
+    let row = [id];
+    html += `<tr><td>${id}</td>`;
+    sortedFolders.forEach(folder => {
+      const match = [...data[folder]].some(name => name.includes(id));
+      const val = match ? "✅" : "❌";
+      html += `<td>${val}</td>`;
+      row.push(match ? 1 : 0);
+    });
+    html += "</tr>";
+    outputData.push(row);
+  });
+  html += "</table>";
+
+  document.getElementById("output").innerHTML = html;
+  document.getElementById("exportExcel").classList.remove("hidden");
+
+  document.getElementById("exportExcel").onclick = () => {
+    const ws_data = [["學號", ...sortedFolders], ...outputData];
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+    // 微軟正黑體 12pt
+    for (const cell in ws) {
+      if (ws[cell] && ws[cell].v !== undefined) {
+        if (!ws[cell].s) ws[cell].s = {};
+        ws[cell].s.font = { name: "Microsoft JhengHei", sz: 12 };
+      }
+    }
+
+    XLSX.utils.book_append_sheet(wb, ws, "作業統計");
+
+    // 自訂檔名
+    let filename = prompt("請輸入要儲存的檔名（不需副檔名）", "作業繳交統計");
+    if (!filename || !filename.trim()) filename = "作業繳交統計";
+    XLSX.writeFile(wb, `${filename}.xlsx`);
+  };
+}
+</script>
+
+</body>
+</html>
