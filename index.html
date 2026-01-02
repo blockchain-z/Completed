@@ -84,6 +84,25 @@
             font-size: 0.9em;
             color: #c0392b;
         }
+        .stat-item {
+        margin: 10px 0;
+        padding: 10px;
+        background: #fff;
+        border-left: 4px solid #e74c3c;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .ans-hint {
+        color: #27ae60;
+        font-weight: bold;
+        display: block;
+        margin-top: 5px;
+    }
+    #total-tests {
+        font-size: 1.2em;
+        color: #2980b9;
+        font-weight: bold;
+    }
     </style>
 </head>
 <body>
@@ -111,6 +130,36 @@
         <div id="wrong-answers-review"></div>
         <button class="btn" onclick="location.reload()">回首頁</button>
     </div>
+    <div class="container">
+    <h1>網路行銷與 AI 科技測驗 v2.0</h1>
+    
+    <div id="start-screen">
+        <div class="stats-box">
+            <h3>📊 學習統計</h3>
+            <p>累積已完成測試次數：<span id="total-tests">0</span> 次</p>
+            <hr>
+            <p>🔥 重点複習：常錯題目 TOP 5（含答案）</p>
+            <div id="freq-missed-list">尚無紀錄</div>
+            <br>
+            <button onclick="resetStats()" style="padding: 5px 10px; cursor: pointer;">重設所有統計資料</button>
+        </div>
+        <button class="btn" onclick="startQuiz()">開始測驗 (隨機 50 題)</button>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+        <div id="questions-container"></div>
+        <button class="btn" onclick="submitQuiz()">提交測驗</button>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h2 id="score-display"></h2>
+        <div id="wrong-answers-review"></div>
+        <button class="btn" onclick="location.reload()">回首頁</button>
+    </div>
+</div>
+
+
+
 </div>
 
 <script>
@@ -416,7 +465,121 @@ function resetStats() {
         updateFreqMissedList();
     }
 }
+    請使用上一則回覆中完整的 200 題陣列
+const completeData = [ /* ... 貼上那 200 題 ... */ ];
+
+let currentQuiz = [];
+let missedStats = JSON.parse(localStorage.getItem('missedStats')) || {};
+let testCount = parseInt(localStorage.getItem('testCount')) || 0;
+
+window.onload = function() {
+    updateUI();
+};
+
+function updateUI() {
+    // 更新測試次數
+    document.getElementById('total-tests').innerText = testCount;
+    
+    // 更新常錯題目列表
+    const listDiv = document.getElementById('freq-missed-list');
+    const sorted = Object.entries(missedStats)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+    
+    if (sorted.length === 0) {
+        listDiv.innerHTML = '<p style="color:gray">尚無錯題紀錄，加油！</p>';
+        return;
+    }
+
+    listDiv.innerHTML = sorted.map(item => {
+        const questionText = item[0];
+        const count = item[1];
+        // 從題庫中找回這題的正確答案
+        const originalQ = completeData.find(qObj => qObj.q === questionText);
+        const correctAns = originalQ ? originalQ.o[originalQ.a] : "資料讀取錯誤";
+        
+        return `
+            <div class="stat-item">
+                <strong>[答錯 ${count} 次]</strong> ${questionText}
+                <span class="ans-hint">💡 正確答案：${correctAns}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function startQuiz() {
+    // 隨機選 50 題的邏輯同前
+    currentQuiz = completeData.sort(() => 0.5 - Math.random()).slice(0, 50);
+    // ... 渲染題目的 code ...
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    
+    // 渲染題目到 #questions-container
+    const container = document.getElementById('questions-container');
+    container.innerHTML = '';
+    currentQuiz.forEach((q, index) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.innerHTML = `
+            <div class="question-text">${index + 1}. ${q.q}</div>
+            <div class="options">
+                ${q.o.map((opt, optIndex) => `
+                    <label><input type="radio" name="q${index}" value="${optIndex}"> ${opt}</label>
+                `).join('')}
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function submitQuiz() {
+    // 1. 增加測試次數
+    testCount++;
+    localStorage.setItem('testCount', testCount);
+
+    let score = 0;
+    const reviewContainer = document.getElementById('wrong-answers-review');
+    reviewContainer.innerHTML = '<h3>❌ 本次測驗錯題檢視</h3>';
+    
+    currentQuiz.forEach((q, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        const userAnswer = selected ? parseInt(selected.value) : null;
+        
+        if (userAnswer === q.a) {
+            score++;
+        } else {
+            // 2. 紀錄錯題統計
+            missedStats[q.q] = (missedStats[q.q] || 0) + 1;
+            
+            const div = document.createElement('div');
+            div.className = 'result-item wrong';
+            div.innerHTML = `
+                <strong>${q.q}</strong><br>
+                您的答案：${userAnswer !== null ? q.o[userAnswer] : '未回答'}<br>
+                正確答案：<span style="color:green; font-weight:bold;">${q.o[q.a]}</span>
+            `;
+            reviewContainer.appendChild(div);
+        }
+    });
+
+    localStorage.setItem('missedStats', JSON.stringify(missedStats));
+    
+    document.getElementById('score-display').innerText = `您的得分：${(score*2)} 分 / 100`;
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('result-screen').classList.remove('hidden');
+}
+
+function resetStats() {
+    if(confirm('確定要清除「測試次數」與「錯題排行」嗎？這將會歸零所有紀錄。')) {
+        localStorage.removeItem('missedStats');
+        localStorage.removeItem('testCount');
+        missedStats = {};
+        testCount = 0;
+        updateUI();
+    }
+}
 </script>
 
 </body>
 </html>
+
