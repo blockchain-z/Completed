@@ -15,13 +15,11 @@
             --text-dim: #8b9bb4;
             --success: #00ff41;
             --danger: #ff2a2a;
-            --border-glow: 0 0 10px rgba(0, 243, 255, 0.3);
         }
 
         body {
-            font-family: 'Share Tech Mono', "Microsoft JhengHei", monospace; /* 優先使用科技字體，中文回退微軟正黑 */
+            font-family: 'Share Tech Mono', "Microsoft JhengHei", monospace;
             background-color: var(--bg-color);
-            /* 科技網格背景 */
             background-image: 
                 linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
@@ -46,7 +44,7 @@
             pointer-events: none;
         }
 
-        /* 懸浮計時器 (HUD 風格) */
+        /* 懸浮計時器 */
         .hud-timer {
             position: fixed;
             top: 20px;
@@ -60,9 +58,8 @@
             z-index: 1000;
             box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
             letter-spacing: 2px;
-            /* 切角設計 */
             clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
-            display: none; /* 測驗開始才顯示 */
+            display: none;
             animation: pulse 2s infinite;
         }
 
@@ -79,7 +76,7 @@
             border: 1px solid var(--neon-cyan);
             box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
             padding: 40px;
-            margin-top: 40px; /* 留給計時器空間 */
+            margin-top: 40px;
             margin-bottom: 40px;
             position: relative;
             backdrop-filter: blur(5px);
@@ -118,6 +115,29 @@
             margin-bottom: 40px;
             border-bottom: 1px solid rgba(0, 243, 255, 0.2);
             padding-bottom: 15px;
+        }
+
+        /* 選單樣式 */
+        .control-panel {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .cyber-select {
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--neon-cyan);
+            border: 1px solid var(--neon-cyan);
+            padding: 10px 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1em;
+            cursor: pointer;
+            outline: none;
+            margin-left: 10px;
+        }
+        
+        .cyber-select option {
+            background: #050510;
+            color: var(--neon-cyan);
         }
 
         /* 統計區塊 */
@@ -291,7 +311,7 @@
         .result-info h2 {
             font-family: 'Orbitron';
             color: var(--neon-pink);
-            font-size: 3.5em; /* 放大分數 */
+            font-size: 3.5em; 
             margin: 0;
             text-shadow: 0 0 20px var(--neon-pink);
         }
@@ -346,6 +366,16 @@
                 <span>SYSTEM STATUS (系統狀態)</span>
                 <span>測驗次數: <span id="total-attempts">0</span></span>
             </div>
+            
+            <div class="control-panel" style="margin-top: 20px; border-top: 1px dashed var(--text-dim); padding-top: 15px;">
+                <label style="color: var(--neon-cyan); font-weight: bold;">SELECT QUANTITY (選擇題數): </label>
+                <select id="question-count" class="cyber-select">
+                    <option value="10">10 題 (快速)</option>
+                    <option value="25">25 題 (標準)</option>
+                    <option value="50" selected>50 題 (挑戰)</option>
+                </select>
+            </div>
+
             <p style="color: var(--text-dim); margin-top: 15px;">// 錯誤率分析 (TOP 5)</p>
             <ul id="freq-missed-list">NO DATA // 無資料</ul>
             <div style="text-align: right; margin-top: 15px;">
@@ -356,7 +386,7 @@
     </div>
 
     <div id="quiz-screen" class="hidden">
-        <div class="progress-text">PROGRESS <span id="progress-num">1</span> / 50</div>
+        <div class="progress-text">PROGRESS <span id="progress-num">1</span> / <span id="total-q-num">50</span></div>
         <div class="progress-container">
             <div class="progress-bar" id="progress-bar"></div>
         </div>
@@ -380,7 +410,7 @@
 <script>
 // 題庫數據 (請保留這部分，並填入您完整的數據)
 const rawData = [
-    {q: "一對一網路行銷（One-to-One Web Marketing）的主要目的是提升什麼？", o: ["顧客購買率與利潤", "產品生產速度", "員工滿意度", "辦公室租金"], a: 0},
+      {q: "一對一網路行銷（One-to-One Web Marketing）的主要目的是提升什麼？", o: ["顧客購買率與利潤", "產品生產速度", "員工滿意度", "辦公室租金"], a: 0},
     {q: "企業分析使用者需求後呈現不同的廣告內容，這是實現什麼策略？", o: ["標準化行銷", "大眾化行銷", "個人化行銷", "匿名化行銷"], a: 2},
     {q: "當使用者購買或搜尋產品時，企業能立即由資料庫取得資訊分析，這是？", o: ["離線資訊處理", "即時資訊處理", "人工手寫處理", "延遲資訊處理"], a: 1},
     {q: "Nike 讓消費者依照喜好設計專屬鞋款，屬於哪種類型的一對一行銷？", o: ["社群參與", "使用者選擇主題", "隨機分配服務", "量身訂製服務"], a: 3},
@@ -582,8 +612,9 @@ const rawData = [
     {q: "數位分身技術幫助企業實現即時的客戶交流與？", o: ["反饋收集", "資金盜取", "隱私侵犯", "數據損毀"], a: 0}
 ];
 
-// 範例資料填充 (實際使用時會自動依賴 rawData)
-const completeData = rawData.length > 50 ? rawData : [...rawData, ...rawData, ...rawData, ...rawData, ...rawData, ...rawData].slice(0, 50);
+// 範例資料填充 (若您的 rawData 足夠，可直接使用 rawData)
+// 這裡確保有足夠資料供 50 題測試
+const completeData = rawData.length >= 50 ? rawData : [...rawData, ...rawData, ...rawData, ...rawData, ...rawData, ...rawData].slice(0, 50);
 
 let currentQuiz = [];
 let missedStats = JSON.parse(localStorage.getItem('missedStats')) || {};
@@ -603,10 +634,18 @@ function updateStatsDisplay() {
 function startQuiz() {
     quizStartTime = Date.now();
     
-    // 隨機選 50 題
-    const pool = completeData;
-    currentQuiz = pool.sort(() => 0.5 - Math.random()).slice(0, 50);
+    // 獲取使用者選擇的題數
+    const qCount = parseInt(document.getElementById('question-count').value);
     
+    // 從完整題庫中隨機抽取指定數量的題目
+    // 為了安全起見，如果題庫總數小於選擇的數量，則使用全部題庫
+    const pool = completeData;
+    const actualCount = Math.min(qCount, pool.length);
+    currentQuiz = pool.sort(() => 0.5 - Math.random()).slice(0, actualCount);
+    
+    // 更新介面上的總題數顯示
+    document.getElementById('total-q-num').innerText = actualCount;
+
     const container = document.getElementById('questions-container');
     container.innerHTML = '';
     
@@ -634,6 +673,8 @@ function startQuiz() {
     const timerEl = document.getElementById('quiz-timer');
     timerEl.style.display = 'block';
     
+    // 重置並啟動計時
+    if (timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(() => {
         const diff = Math.floor((Date.now() - quizStartTime) / 1000);
         const m = Math.floor(diff / 60).toString().padStart(2, '0');
@@ -722,9 +763,9 @@ function submitQuiz() {
             </div>`;
     }
 
-    // 計算百分比
+    // 計算百分比 (根據實際抽出的題數 currentQuiz.length 計算)
     const totalQuestions = currentQuiz.length;
-    const percentageScore = Math.round((score / totalQuestions) * 100);
+    const percentageScore = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
 
     localStorage.setItem('missedStats', JSON.stringify(missedStats));
     
