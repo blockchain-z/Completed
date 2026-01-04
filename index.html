@@ -3,151 +3,382 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>數位行銷與 AI 科技題庫測驗</title>
+    <title>AI 數位戰情室 // 測驗系統</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --accent-color: #3498db;
-            --correct-bg: #d4edda;
-            --wrong-bg: #f8d7da;
-            --timer-bg: #e74c3c;
-            --timer-text: #fff;
+            --bg-color: #050510;
+            --card-bg: rgba(16, 20, 35, 0.9);
+            --neon-cyan: #00f3ff;
+            --neon-pink: #bc13fe;
+            --text-main: #e0e6ed;
+            --text-dim: #8b9bb4;
+            --success: #00ff41;
+            --danger: #ff2a2a;
+            --border-glow: 0 0 10px rgba(0, 243, 255, 0.3);
         }
+
         body {
-            font-family: "Microsoft JhengHei", Arial, sans-serif;
-            line-height: 1.6;
-            background-color: #f4f7f6;
+            font-family: 'Share Tech Mono', "Microsoft JhengHei", monospace; /* 優先使用科技字體，中文回退微軟正黑 */
+            background-color: var(--bg-color);
+            /* 科技網格背景 */
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: var(--text-main);
+            min-height: 100vh;
             margin: 0;
             padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: relative; /* 為了定位計時器 */
+
+        /* 頂部掃描線特效 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: -1;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
         }
-        h1, h2 {
-            text-align: center;
-            color: var(--primary-color);
-        }
-        /* 計時器樣式 */
-        .timer-badge {
+
+        /* 懸浮計時器 (HUD 風格) */
+        .hud-timer {
             position: fixed;
             top: 20px;
             right: 20px;
-            background-color: var(--timer-bg);
-            color: var(--timer-text);
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1.2em;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 10px 25px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5em;
             z-index: 1000;
-            display: none; /* 預設隱藏，測驗開始才顯示 */
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+            letter-spacing: 2px;
+            /* 切角設計 */
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+            display: none; /* 測驗開始才顯示 */
+            animation: pulse 2s infinite;
         }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 15px rgba(0, 243, 255, 0.3); border-color: var(--neon-cyan); }
+            50% { box-shadow: 0 0 25px rgba(0, 243, 255, 0.6); border-color: #fff; }
+            100% { box-shadow: 0 0 15px rgba(0, 243, 255, 0.3); border-color: var(--neon-cyan); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: var(--card-bg);
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+            padding: 40px;
+            margin-top: 40px; /* 留給計時器空間 */
+            margin-bottom: 40px;
+            position: relative;
+            backdrop-filter: blur(5px);
+            clip-path: polygon(
+                20px 0, 100% 0, 
+                100% calc(100% - 20px), calc(100% - 20px) 100%, 
+                0 100%, 0 20px
+            );
+            animation: slideIn 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 裝飾角落 */
+        .container::after {
+            content: "";
+            position: absolute;
+            top: 0; right: 0;
+            width: 100px; height: 100px;
+            border-top: 2px solid var(--neon-cyan);
+            border-right: 2px solid var(--neon-cyan);
+            border-top-right-radius: 5px;
+            pointer-events: none;
+        }
+
+        h1 {
+            font-family: 'Orbitron', "Microsoft JhengHei", sans-serif;
+            text-align: center;
+            color: var(--neon-cyan);
+            font-size: 2.2em;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--neon-cyan);
+            margin-bottom: 40px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+            padding-bottom: 15px;
+        }
+
+        /* 統計區塊 */
         .stats-box {
-            background: #eef2f7;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 5px solid var(--accent-color);
-        }
-        .question-card {
-            margin-bottom: 25px;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        .question-text {
-            font-weight: bold;
+            background: rgba(0, 243, 255, 0.05);
+            border-left: 4px solid var(--neon-pink);
+            padding: 20px;
+            margin-bottom: 30px;
             font-size: 1.1em;
-            margin-bottom: 10px;
         }
-        .options label {
-            display: block;
-            margin: 8px 0;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 4px;
-            transition: background 0.2s;
+
+        .stats-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--neon-pink);
+            font-weight: bold;
+            font-family: 'Orbitron', "Microsoft JhengHei";
         }
-        .options label:hover {
-            background-color: #f0f0f0;
+
+        #freq-missed-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+            border-top: 1px dashed var(--text-dim);
         }
+
+        #freq-missed-list li {
+            padding: 10px 0;
+            color: var(--text-dim);
+            font-size: 0.9em;
+        }
+
+        /* 按鈕設計 */
         .btn {
             display: block;
             width: 100%;
-            padding: 15px;
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1.1em;
+            padding: 18px;
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--neon-cyan);
+            border: 1px solid var(--neon-cyan);
+            font-family: 'Orbitron', "Microsoft JhengHei", sans-serif;
+            font-size: 1.2em;
+            letter-spacing: 2px;
             cursor: pointer;
-            margin-top: 20px;
+            transition: all 0.3s;
+            margin-top: 30px;
+            position: relative;
+            overflow: hidden;
         }
+
         .btn:hover {
-            background-color: #2980b9;
-        }
-        .result-item {
-            padding: 10px;
-            margin-top: 5px;
-            border-radius: 4px;
-        }
-        .wrong { background-color: var(--wrong-bg); color: #721c24; }
-        .correct { background-color: var(--correct-bg); color: #155724; }
-        .hidden { display: none; }
-        #freq-missed-list {
-            font-size: 0.9em;
-            color: #c0392b;
-        }
-        /* 分數顯示區塊大字體 */
-        .score-big {
-            font-size: 2.5em;
-            color: var(--accent-color);
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-cyan);
             font-weight: bold;
-            margin: 10px 0;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--text-dim);
+            color: var(--text-dim);
+            padding: 5px 15px;
+            font-family: "Microsoft JhengHei", monospace;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .btn-outline:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+            text-shadow: 0 0 5px var(--danger);
+        }
+
+        /* 進度條 */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: #222;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--neon-pink);
+            width: 0%;
+            box-shadow: 0 0 10px var(--neon-pink);
+            transition: width 0.3s linear;
+        }
+
+        .progress-text {
+            text-align: right;
+            color: var(--neon-cyan);
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            font-family: 'Orbitron';
+        }
+
+        /* 題目卡片 */
+        .question-card {
+            margin-bottom: 40px;
+            border-bottom: 1px dashed rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            color: var(--white);
+            margin-bottom: 25px;
+            line-height: 1.6;
+            text-shadow: 0 0 2px rgba(255,255,255,0.5);
+        }
+
+        /* 選項設計 */
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .options label {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        .options label:hover {
+            border-color: var(--neon-cyan);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        .options label.selected {
+            border-color: var(--neon-cyan);
+            background: rgba(0, 243, 255, 0.15);
+            box-shadow: inset 0 0 10px rgba(0, 243, 255, 0.2);
+        }
+
+        .options label::before {
+            content: ">>";
+            color: var(--text-dim);
+            margin-right: 15px;
+            font-family: 'Share Tech Mono';
+            transition: 0.2s;
+        }
+
+        .options label.selected::before {
+            color: var(--neon-cyan);
+            content: "SELECTED_";
+        }
+
+        .options input[type="radio"] {
+            display: none;
+        }
+
+        /* 結果頁面 */
+        .result-info {
+            border: 1px solid var(--neon-pink);
+            background: rgba(188, 19, 254, 0.05);
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.2);
+        }
+
+        .result-info h2 {
+            font-family: 'Orbitron';
+            color: var(--neon-pink);
+            font-size: 3.5em; /* 放大分數 */
+            margin: 0;
+            text-shadow: 0 0 20px var(--neon-pink);
+        }
+        
+        .score-unit {
+            font-size: 0.4em;
+            opacity: 0.8;
+        }
+
+        .result-item {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            margin-top: 15px;
+            border-left: 3px solid var(--danger);
+        }
+
+        .correct-ans-display {
+            margin-top: 10px;
+            color: var(--success);
+            font-weight: bold;
+            padding: 5px 0;
+            border-top: 1px dotted #444;
+            text-shadow: 0 0 5px var(--success);
+        }
+
+        .explanation {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: var(--text-dim);
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px; margin-top: 60px; clip-path: none; border: none; border-top: 2px solid var(--neon-cyan);}
+            h1 { font-size: 1.5em; }
+            .question-text { font-size: 1.1em; }
+            .hud-timer { font-size: 1.2em; padding: 8px 15px; top: 10px; right: 10px; }
         }
     </style>
 </head>
 <body>
 
-<div id="quiz-timer" class="timer-badge">⏱️ 00:00</div>
+<div id="quiz-timer" class="hud-timer">00:00</div>
 
 <div class="container">
-    <h1>社群媒體經營題庫測驗</h1>
+    <h1>DIGITAL WARROOM // AI 戰情測驗</h1>
     
     <div id="start-screen">
         <div class="stats-box">
-            <h3>📊 學習統計</h3>
-            <p>累積最高錯題率題目（前5名）：</p>
-            <ul id="freq-missed-list">無紀錄</ul>
-            <button onclick="resetStats()" style="font-size: 0.8em; background: none; border: 1px solid #ccc; cursor: pointer; padding: 5px;">清除錯題紀錄</button>
+            <div class="stats-grid">
+                <span>SYSTEM STATUS (系統狀態)</span>
+                <span>測驗次數: <span id="total-attempts">0</span></span>
+            </div>
+            <p style="color: var(--text-dim); margin-top: 15px;">// 錯誤率分析 (TOP 5)</p>
+            <ul id="freq-missed-list">NO DATA // 無資料</ul>
+            <div style="text-align: right; margin-top: 15px;">
+                <button onclick="resetStats()" class="btn-outline">[RESET SYSTEM DATA / 清除紀錄]</button>
+            </div>
         </div>
-        <button class="btn" onclick="startQuiz()">開始測驗 (隨機 50 題)</button>
+        <button class="btn" onclick="startQuiz()">INITIALIZE // 啟動測驗程序</button>
     </div>
 
     <div id="quiz-screen" class="hidden">
+        <div class="progress-text">PROGRESS <span id="progress-num">1</span> / 50</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
         <div id="questions-container"></div>
-        <button class="btn" onclick="submitQuiz()">提交測驗</button>
+        <button class="btn" onclick="submitQuiz()">// SUBMIT DATA // 提交數據</button>
     </div>
 
     <div id="result-screen" class="hidden">
-        <h2>測驗結果</h2>
-        <div style="text-align: center;">
-            <div id="final-score" class="score-big">0 分</div>
-            <p id="score-details"></p>
-            <p id="time-spent-display" style="color: #666;"></p>
+        <div class="result-info">
+            <div style="font-size: 0.9em; color: var(--neon-pink); letter-spacing: 2px; margin-bottom: 10px;">MISSION REPORT // 任務報告</div>
+            <h2 id="score-display">0 <span class="score-unit">%</span></h2>
+            <div id="score-detail-text" style="color: var(--text-main); margin-top: 10px; font-weight: bold;"></div>
+            <div id="time-display" style="margin-top: 10px; color: var(--text-dim); font-family: 'Share Tech Mono';"></div>
         </div>
         <div id="wrong-answers-review"></div>
-        <button class="btn" onclick="location.reload()">回到首頁</button>
+        <button class="btn" onclick="location.reload()">RESTART SYSTEM // 重新啟動</button>
     </div>
 </div>
 
 <script>
-// 題庫數據 (請務必保留您的完整題庫數據)
+// 題庫數據 (請保留這部分，並填入您完整的數據)
 const rawData = [
     {q: "一對一網路行銷（One-to-One Web Marketing）的主要目的是提升什麼？", o: ["顧客購買率與利潤", "產品生產速度", "員工滿意度", "辦公室租金"], a: 0},
     {q: "企業分析使用者需求後呈現不同的廣告內容，這是實現什麼策略？", o: ["標準化行銷", "大眾化行銷", "個人化行銷", "匿名化行銷"], a: 2},
@@ -351,27 +582,30 @@ const rawData = [
     {q: "數位分身技術幫助企業實現即時的客戶交流與？", o: ["反饋收集", "資金盜取", "隱私侵犯", "數據損毀"], a: 0}
 ];
 
-// 請補完完整 200 題 (這裡使用您的範例變數)
-const completeData = [...rawData]; 
-// 為了演示效果，若題目不足 50，將會重複使用 (實際請填入完整資料)
+// 範例資料填充 (實際使用時會自動依賴 rawData)
+const completeData = rawData.length > 50 ? rawData : [...rawData, ...rawData, ...rawData, ...rawData, ...rawData, ...rawData].slice(0, 50);
 
 let currentQuiz = [];
 let missedStats = JSON.parse(localStorage.getItem('missedStats')) || {};
+let quizStartTime;
 let timerInterval;
-let startTime;
 
-// 初始化
 window.onload = function() {
-    updateFreqMissedList();
+    updateStatsDisplay();
 };
 
+function updateStatsDisplay() {
+    updateFreqMissedList();
+    const attempts = localStorage.getItem('totalAttempts') || 0;
+    document.getElementById('total-attempts').innerText = attempts;
+}
+
 function startQuiz() {
-    // 隨機選 50 題 (若資料不足則全取)
-    if(completeData.length >= 50) {
-        currentQuiz = completeData.sort(() => 0.5 - Math.random()).slice(0, 50);
-    } else {
-        currentQuiz = completeData.sort(() => 0.5 - Math.random());
-    }
+    quizStartTime = Date.now();
+    
+    // 隨機選 50 題
+    const pool = completeData;
+    currentQuiz = pool.sort(() => 0.5 - Math.random()).slice(0, 50);
     
     const container = document.getElementById('questions-container');
     container.innerHTML = '';
@@ -380,12 +614,12 @@ function startQuiz() {
         const card = document.createElement('div');
         card.className = 'question-card';
         card.innerHTML = `
-            <div class="question-text">第 ${index + 1} 題：${q.q}</div>
+            <div class="question-text">:: QUERY_0${index + 1} :: <br>${q.q}</div>
             <div class="options">
                 ${q.o.map((opt, optIndex) => `
-                    <label>
+                    <label onclick="selectOption(this, 'q${index}')">
                         <input type="radio" name="q${index}" value="${optIndex}">
-                        ${opt}
+                        <span>${opt}</span>
                     </label>
                 `).join('')}
             </div>
@@ -396,38 +630,65 @@ function startQuiz() {
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('quiz-screen').classList.remove('hidden');
     
-    // 啟動計時器
-    document.getElementById('quiz-timer').style.display = 'block';
-    startTimer();
+    // 啟動 HUD 計時器
+    const timerEl = document.getElementById('quiz-timer');
+    timerEl.style.display = 'block';
+    
+    timerInterval = setInterval(() => {
+        const diff = Math.floor((Date.now() - quizStartTime) / 1000);
+        const m = Math.floor(diff / 60).toString().padStart(2, '0');
+        const s = (diff % 60).toString().padStart(2, '0');
+        timerEl.innerText = `${m}:${s}`;
+    }, 1000);
+
+    updateProgress();
+    window.scrollTo(0, 0);
 }
 
-function startTimer() {
-    startTime = Date.now();
-    timerInterval = setInterval(() => {
-        const elapsedTime = Date.now() - startTime;
-        const seconds = Math.floor((elapsedTime / 1000) % 60);
-        const minutes = Math.floor((elapsedTime / 1000 / 60) % 60);
-        const formattedTime = 
-            (minutes < 10 ? "0" + minutes : minutes) + ":" + 
-            (seconds < 10 ? "0" + seconds : seconds);
-        document.getElementById('quiz-timer').innerText = `⏱️ ${formattedTime}`;
-    }, 1000);
+function selectOption(label, groupName) {
+    const allLabels = label.parentElement.querySelectorAll('label');
+    allLabels.forEach(l => l.classList.remove('selected'));
+    label.classList.add('selected');
+    
+    // 延遲一下讓動畫跑完
+    setTimeout(updateProgress, 50);
+}
+
+function updateProgress() {
+    const total = currentQuiz.length;
+    let answered = 0;
+    currentQuiz.forEach((_, i) => {
+        if(document.querySelector(`input[name="q${i}"]:checked`)) {
+            answered++;
+        }
+    });
+    
+    const percentage = (answered / total) * 100;
+    document.getElementById('progress-bar').style.width = `${percentage}%`;
+    document.getElementById('progress-num').innerText = answered;
 }
 
 function submitQuiz() {
     // 停止計時
     clearInterval(timerInterval);
-    const elapsedTime = Date.now() - startTime;
-    const totalSeconds = Math.floor(elapsedTime / 1000);
-    const finalMinutes = Math.floor(totalSeconds / 60);
-    const finalSeconds = totalSeconds % 60;
-    const timeString = `${finalMinutes} 分 ${finalSeconds} 秒`;
+    document.getElementById('quiz-timer').style.display = 'none';
+
+    // 計算時間
+    const timeDiff = Math.floor((Date.now() - quizStartTime) / 1000);
+    const minutes = Math.floor(timeDiff / 60);
+    const seconds = timeDiff % 60;
+    const timeString = `${minutes} 分 ${seconds} 秒`;
+
+    // 紀錄次數
+    let attempts = parseInt(localStorage.getItem('totalAttempts') || 0);
+    attempts++;
+    localStorage.setItem('totalAttempts', attempts);
 
     let score = 0;
     const reviewContainer = document.getElementById('wrong-answers-review');
-    reviewContainer.innerHTML = '<h3>❌ 錯題檢視與正確答案</h3>';
+    reviewContainer.innerHTML = '<h3 style="color:var(--danger); border-bottom:1px solid var(--danger); padding-bottom:10px;">[ ERROR LOGS / 錯題分析 ]</h3>';
     
-    let wrongCount = 0;
+    let hasWrongAnswers = false;
 
     currentQuiz.forEach((q, index) => {
         const selected = document.querySelector(`input[name="q${index}"]:checked`);
@@ -436,41 +697,45 @@ function submitQuiz() {
         if (userAnswer === q.a) {
             score++;
         } else {
-            wrongCount++;
-            // 紀錄錯題統計
+            hasWrongAnswers = true;
             missedStats[q.q] = (missedStats[q.q] || 0) + 1;
             
-            // 顯示錯題 review
             const div = document.createElement('div');
             div.className = 'result-item wrong';
             div.innerHTML = `
-                <strong>第 ${index + 1} 題：${q.q}</strong><br>
-                您的答案：${userAnswer !== null ? q.o[userAnswer] : '未作答'}<br>
-                正确答案：<span style="color:green; font-weight:bold;">${q.o[q.a]}</span>
+                <div style="font-weight:bold; color:#fff;">:: ERR_Q${index + 1} :: ${q.q}</div>
+                <div style="margin:5px 0; color:var(--danger);">您的輸入: ${userAnswer !== null ? q.o[userAnswer] : '未作答 (NULL)'}</div>
+                <div class="correct-ans-display">正確數據: ${q.o[q.a]}</div>
+                <div class="explanation">
+                    DATA: ${q.desc ? q.desc : 'No additional data found.'}
+                </div>
             `;
             reviewContainer.appendChild(div);
         }
     });
-    
-    if(wrongCount === 0) {
-        reviewContainer.innerHTML = '<p style="color:green; font-weight:bold; text-align:center;">太厲害了！全對！🎉</p>';
+
+    if (!hasWrongAnswers) {
+        reviewContainer.innerHTML += `
+            <div style="text-align:center; padding:20px; color:var(--success); border:1px solid var(--success);">
+                <h3>>> SYSTEM PERFECT <<</h3>
+                <p>無錯誤偵測，表現完美。</p>
+            </div>`;
     }
 
-    // 計算百分比成績
+    // 計算百分比
     const totalQuestions = currentQuiz.length;
     const percentageScore = Math.round((score / totalQuestions) * 100);
 
     localStorage.setItem('missedStats', JSON.stringify(missedStats));
     
-    // 顯示結果
-    document.getElementById('final-score').innerText = `${percentageScore} 分`;
-    document.getElementById('score-details').innerText = `答對 ${score} 題 / 共 ${totalQuestions} 題`;
-    document.getElementById('time-spent-display').innerText = `⏱️ 總作答時間：${timeString}`;
+    // 更新 UI
+    document.getElementById('score-display').innerHTML = `${percentageScore} <span class="score-unit">%</span>`;
+    document.getElementById('score-detail-text').innerText = `答對: ${score} / ${totalQuestions} 題`;
+    document.getElementById('time-display').innerText = `耗時: ${timeString}`;
     
     document.getElementById('quiz-screen').classList.add('hidden');
-    document.getElementById('quiz-timer').style.display = 'none'; // 隱藏計時器
     document.getElementById('result-screen').classList.remove('hidden');
-    window.scrollTo(0, 0); // 捲動到頂部
+    window.scrollTo(0, 0);
 }
 
 function updateFreqMissedList() {
@@ -480,20 +745,24 @@ function updateFreqMissedList() {
         .slice(0, 5);
     
     if (sorted.length === 0) {
-        list.innerHTML = '<li>尚無資料</li>';
+        list.innerHTML = '<li>>> SYSTEM CLEAN. 無錯誤紀錄。</li>';
         return;
     }
 
     list.innerHTML = sorted.map(item => `
-        <li>[錯 ${item[1]} 次] ${item[0]}</li>
+        <li>
+            <span style="color:var(--danger);">[錯誤: ${item[1]} 次]</span> 
+            ${item[0]}
+        </li>
     `).join('');
 }
 
 function resetStats() {
-    if(confirm('確定要清除所有題目錯誤紀錄嗎？')) {
+    if(confirm('警告：此操作將清除所有系統紀錄與統計數據。確定執行？')) {
         localStorage.removeItem('missedStats');
+        localStorage.removeItem('totalAttempts');
         missedStats = {};
-        updateFreqMissedList();
+        updateStatsDisplay();
     }
 }
 </script>
