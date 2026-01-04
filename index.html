@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>社群媒體行銷 // 測驗系統</title>
+    <title>社群媒體行銷 // 終極測驗系統 v7.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -34,7 +34,6 @@
             align-items: flex-start;
         }
 
-        /* 頂部掃描線特效 */
         body::before {
             content: "";
             position: fixed;
@@ -45,7 +44,6 @@
             pointer-events: none;
         }
 
-        /* 懸浮計時器 */
         .hud-timer {
             position: fixed;
             top: 20px;
@@ -81,26 +79,10 @@
             margin-bottom: 40px;
             position: relative;
             backdrop-filter: blur(5px);
-            clip-path: polygon(
-                20px 0, 100% 0, 
-                100% calc(100% - 20px), calc(100% - 20px) 100%, 
-                0 100%, 0 20px
-            );
-        }
-
-        /* 裝飾角落 */
-        .container::after {
-            content: "";
-            position: absolute;
-            top: 0; right: 0;
-            width: 80px; height: 80px;
-            border-top: 2px solid var(--neon-cyan);
-            border-right: 2px solid var(--neon-cyan);
-            pointer-events: none;
+            clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
         }
 
         h1 {
-            font-family: 'Noto Sans TC', sans-serif;
             text-align: center;
             color: var(--neon-cyan);
             font-size: 2em;
@@ -111,11 +93,10 @@
             padding-bottom: 15px;
         }
 
-        /* 題數選擇器 */
         .control-panel {
             margin: 20px 0;
             text-align: center;
-            padding: 15px;
+            padding: 20px;
             border: 1px dashed rgba(0, 243, 255, 0.3);
             background: rgba(0, 0, 0, 0.3);
         }
@@ -126,13 +107,11 @@
             border: 1px solid var(--neon-cyan);
             padding: 8px 15px;
             font-family: 'Share Tech Mono', sans-serif;
-            font-size: 1.1em;
+            font-size: 1em;
             cursor: pointer;
-            margin-left: 10px;
-            box-shadow: 0 0 5px rgba(0, 243, 255, 0.2);
+            margin: 5px;
         }
 
-        /* 統計與歷史區塊 */
         .stats-box {
             background: rgba(0, 243, 255, 0.03);
             border-left: 4px solid var(--neon-pink);
@@ -147,48 +126,8 @@
             margin-bottom: 10px;
             display: block;
             border-bottom: 1px dotted var(--text-dim);
-            padding-bottom: 5px;
         }
 
-        /* 歷史紀錄表格 */
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            font-size: 0.9em;
-        }
-
-        .history-table th {
-            text-align: left;
-            color: var(--text-dim);
-            padding: 5px;
-            border-bottom: 1px solid var(--text-dim);
-        }
-
-        .history-table td {
-            padding: 8px 5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-main);
-        }
-
-        .rank-s { color: var(--success); text-shadow: 0 0 5px var(--success); }
-        .rank-a { color: var(--neon-cyan); }
-        .rank-b { color: var(--warning); }
-        .rank-c { color: var(--danger); }
-
-        #freq-missed-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        #freq-missed-list li {
-            padding: 8px 0;
-            color: var(--text-dim);
-            font-size: 0.9em;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        /* 按鈕 */
         .btn {
             display: block;
             width: 100%;
@@ -203,74 +142,16 @@
             transition: all 0.3s;
             margin-top: 25px;
             text-transform: uppercase;
-            position: relative;
-            overflow: hidden;
         }
 
         .btn:hover {
             background: var(--neon-cyan);
             color: #000;
             box-shadow: 0 0 20px var(--neon-cyan);
-            font-weight: bold;
         }
 
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--text-dim);
-            color: var(--text-dim);
-            padding: 6px 15px;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
-        }
-        
-        .btn-outline:hover {
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-
-        /* 題目與選項 */
-        .progress-container {
-            width: 100%;
-            height: 4px;
-            background: #222;
-            margin-bottom: 30px;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: var(--neon-pink);
-            width: 0%;
-            box-shadow: 0 0 10px var(--neon-pink);
-            transition: width 0.3s linear;
-        }
-
-        .progress-text {
-            text-align: right;
-            color: var(--neon-cyan);
-            font-size: 0.9em;
-            margin-bottom: 5px;
-        }
-
-        .question-card {
-            margin-bottom: 30px;
-            border-bottom: 1px dashed rgba(255,255,255,0.1);
-            padding-bottom: 20px;
-        }
-
-        .question-text {
-            font-size: 1.25em;
-            color: var(--white);
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
-        .options {
-            display: grid;
-            gap: 12px;
-        }
-
+        /* 題目選項樣式 */
+        .options { display: grid; gap: 12px; }
         .options label {
             display: flex;
             align-items: center;
@@ -279,76 +160,38 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             cursor: pointer;
             transition: all 0.2s;
-            position: relative;
-            /* 切角 */
             clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
         }
-
-        .options label:hover {
-            border-color: var(--neon-cyan);
-            background: rgba(0, 243, 255, 0.05);
-        }
-
-        .options label.selected {
-            border-color: var(--neon-cyan);
-            background: rgba(0, 243, 255, 0.15);
-            box-shadow: inset 0 0 10px rgba(0, 243, 255, 0.2);
-        }
-
-        .options label::before {
-            content: ">>";
-            color: var(--text-dim);
-            margin-right: 15px;
-            font-family: 'Share Tech Mono';
-        }
-
-        .options label.selected::before {
-            color: var(--neon-cyan);
-            content: "已選定_";
-        }
-
-        .options input[type="radio"] { display: none; }
-
-        /* 結果頁 */
-        .result-info {
-            border: 1px solid var(--neon-pink);
-            background: rgba(188, 19, 254, 0.05);
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 30px;
-            box-shadow: 0 0 20px rgba(188, 19, 254, 0.15);
-        }
-
-        .result-info h2 {
-            font-family: 'Orbitron';
-            color: var(--neon-pink);
-            font-size: 3.5em; 
-            margin: 0;
-            text-shadow: 0 0 15px var(--neon-pink);
-        }
+        .options label:hover:not(.locked) { border-color: var(--neon-cyan); background: rgba(0, 243, 255, 0.05); }
+        .options label.selected { border-color: var(--neon-cyan); background: rgba(0, 243, 255, 0.15); }
         
-        .result-item {
-            background: rgba(0,0,0,0.3);
-            padding: 15px;
+        /* 即時反饋樣式 */
+        .options label.correct-instant {
+            border-color: var(--success) !important;
+            background: rgba(0, 255, 65, 0.15) !important;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+        }
+        .options label.wrong-instant {
+            border-color: var(--danger) !important;
+            background: rgba(255, 42, 42, 0.15) !important;
+            box-shadow: 0 0 15px rgba(255, 42, 42, 0.3);
+        }
+        .explanation-box {
             margin-top: 15px;
-            border-left: 3px solid var(--danger);
+            padding: 15px;
+            background: rgba(0, 243, 255, 0.05);
+            border: 1px solid var(--neon-cyan);
+            font-size: 0.9em;
+            display: none;
+            animation: fadeIn 0.5s;
         }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .correct-ans-display {
-            margin-top: 8px;
-            color: var(--success);
-            font-weight: bold;
-            padding-top: 5px;
-            border-top: 1px dotted #444;
-        }
-
+        .progress-bar { height: 4px; background: var(--neon-pink); width: 0%; transition: width 0.3s; margin-bottom: 20px; }
         .hidden { display: none !important; }
 
-        @media (max-width: 600px) {
-            .container { padding: 20px; margin-top: 60px; clip-path: none; border: none; border-top: 2px solid var(--neon-cyan);}
-            .hud-timer { top: 10px; right: 10px; font-size: 1.1em; padding: 5px 15px; }
-            h1 { font-size: 1.6em; }
-        }
+        .history-table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        .history-table th, .history-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; }
     </style>
 </head>
 <body>
@@ -356,79 +199,61 @@
 <div id="quiz-timer" class="hud-timer">00:00</div>
 
 <div class="container">
-    <h1>社群媒體行銷 // 測驗系統</h1>
+    <h1>社群媒體行銷 // 測驗系統 v7.0</h1>
     
     <div id="start-screen">
-        
         <div class="stats-box">
             <span class="section-title">📊 系統狀態與歷史戰績</span>
-            <div style="margin-bottom: 15px; color: var(--text-main);">
-                累積測驗次數：<span id="total-attempts" style="color: var(--neon-cyan); font-weight: bold;">0</span> 次
-            </div>
-            
-            <div style="max-height: 200px; overflow-y: auto;">
+            累積測試：<span id="total-attempts" style="color: var(--neon-cyan);">0</span> 次
+            <div style="max-height: 150px; overflow-y: auto; margin-top: 10px;">
                 <table class="history-table">
-                    <thead>
-                        <tr>
-                            <th>日期</th>
-                            <th>模式</th>
-                            <th>成績</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-list">
-                        <tr><td colspan="3" style="text-align:center; padding:10px;">尚無戰鬥紀錄</td></tr>
-                    </tbody>
+                    <thead><tr><th>日期</th><th>模式</th><th>成績</th></tr></thead>
+                    <tbody id="history-list"></tbody>
                 </table>
-            </div>
-            <div style="text-align: right; margin-top: 10px;">
-                <button onclick="clearHistory()" class="btn-outline" style="font-size:0.8em;">[清除歷史紀錄]</button>
-            </div>
-        </div>
-
-        <div class="stats-box">
-            <span class="section-title">⚠️ 高頻錯誤分析 (前 5 名)</span>
-            <ul id="freq-missed-list">目前無錯誤資料</ul>
-            <div style="text-align: right;">
-                <button onclick="resetMissedStats()" class="btn-outline">[清除錯題數據]</button>
             </div>
         </div>
 
         <div class="control-panel">
-            <label style="color: var(--neon-cyan); font-weight: bold;">設定測驗強度 (題數): </label>
-            <select id="question-count" class="cyber-select">
-                <option value="10">10 題 (快速偵查)</option>
-                <option value="25">25 題 (標準作戰)</option>
-                <option value="50" selected>50 題 (極限挑戰)</option>
-            </select>
+            <div>
+                <label style="color: var(--neon-cyan);">任務類型：</label>
+                <select id="quiz-mode" class="cyber-select">
+                    <option value="EXAM">標準作戰 (EXAM - 最後顯示結果)</option>
+                    <option value="PRACTICE">即時演練 (PRACTICE - 即刻判斷對錯)</option>
+                </select>
+            </div>
+            <div style="margin-top: 10px;">
+                <label style="color: var(--neon-cyan);">設定題數：</label>
+                <select id="question-count" class="cyber-select">
+                    <option value="10">10 題</option>
+                    <option value="25">25 題</option>
+                    <option value="50" selected>50 題</option>
+                </select>
+            </div>
         </div>
 
-        <button class="btn" onclick="startQuiz()">啟動測驗程序 // START</button>
+        <button class="btn" onclick="startQuiz()">啟動程序 // START</button>
     </div>
 
     <div id="quiz-screen" class="hidden">
-        <div class="progress-text">進度掃描 <span id="progress-num">1</span> / <span id="total-q-num">50</span></div>
-        <div class="progress-container">
-            <div class="progress-bar" id="progress-bar"></div>
-        </div>
-
+        <div id="progress-text" style="color: var(--neon-cyan); font-size: 0.9em; margin-bottom: 5px;"></div>
+        <div class="progress-bar" id="progress-bar"></div>
         <div id="questions-container"></div>
-        <button class="btn" onclick="submitQuiz()">提交作戰數據 // SUBMIT</button>
+        <button class="btn" onclick="submitQuiz()">終結任務 // FINISH</button>
     </div>
 
     <div id="result-screen" class="hidden">
-        <div class="result-info">
-            <div style="font-size: 0.9em; color: var(--neon-pink); letter-spacing: 2px; margin-bottom: 10px;">任務執行報告</div>
-            <h2 id="score-display">0 <span style="font-size:0.4em;">%</span></h2>
-            <div id="score-detail-text" style="color: var(--text-main); margin-top: 10px; font-weight: bold;"></div>
-            <div id="time-display" style="margin-top: 10px; color: var(--text-dim);"></div>
+        <div style="text-align: center; padding: 30px; border: 1px solid var(--neon-pink); background: rgba(188, 19, 254, 0.05);">
+            <div style="color: var(--neon-pink); font-size: 0.9em;">任務執行報告</div>
+            <h2 id="score-display" style="font-size: 3.5em; text-shadow: 0 0 15px var(--neon-pink); margin: 10px 0;">0%</h2>
+            <div id="score-detail-text"></div>
         </div>
         <div id="wrong-answers-review"></div>
-        <button class="btn" onclick="location.reload()">重新啟動系統 // RESTART</button>
+        <button class="btn" onclick="location.reload()">重新啟動 // REBOOT</button>
     </div>
 </div>
 
 <script>
-// 題庫數據 (請保留並填入完整數據)
+// 此處請填入你提供的 rawData
 const rawData = [
   {q: "一對一網路行銷（One-to-One Web Marketing）的主要目的是提升什麼？", o: ["顧客購買率與利潤", "產品生產速度", "員工滿意度", "辦公室租金"], a: 0},
     {q: "企業分析使用者需求後呈現不同的廣告內容，這是實現什麼策略？", o: ["標準化行銷", "大眾化行銷", "個人化行銷", "匿名化行銷"], a: 2},
@@ -632,83 +457,54 @@ const rawData = [
     {q: "數位分身技術幫助企業實現即時的客戶交流與？", o: ["反饋收集", "資金盜取", "隱私侵犯", "數據損毀"], a: 0}
 ];
 
-// 防止題目不足的保護機制 (測試用)
-const completeData = rawData.length >= 50 ? rawData : [...rawData, ...rawData, ...rawData, ...rawData, ...rawData].slice(0, 50);
+// 補足測試題目至 200 題邏輯 (範例)
+const completeData = rawData; 
 
 let currentQuiz = [];
 let missedStats = JSON.parse(localStorage.getItem('missedStats')) || {};
 let quizHistory = JSON.parse(localStorage.getItem('quizHistory')) || [];
 let quizStartTime;
 let timerInterval;
+let currentMode = "EXAM";
 
 window.onload = function() {
     updateStatsDisplay();
 };
 
 function updateStatsDisplay() {
-    // 更新錯題榜
-    const list = document.getElementById('freq-missed-list');
-    const sorted = Object.entries(missedStats).sort((a, b) => b[1] - a[1]).slice(0, 5);
-    if (sorted.length === 0) {
-        list.innerHTML = '<li>>> 系統運作完美，無錯誤紀錄。</li>';
-    } else {
-        list.innerHTML = sorted.map(item => `<li><span style="color:var(--danger);">[錯 ${item[1]} 次]</span> ${item[0]}</li>`).join('');
-    }
-
-    // 更新總次數
     document.getElementById('total-attempts').innerText = quizHistory.length;
-
-    // 更新歷史戰績表格
     const historyList = document.getElementById('history-list');
-    if (quizHistory.length === 0) {
-        historyList.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:10px; color:var(--text-dim);">尚無戰鬥紀錄</td></tr>';
-    } else {
-        // 顯示最近 10 筆，最新的在上面
-        const recentHistory = quizHistory.slice().reverse().slice(0, 10);
-        historyList.innerHTML = recentHistory.map(h => {
-            let rankClass = 'rank-c';
-            let rankText = 'C';
-            if(h.score >= 90) { rankClass = 'rank-s'; rankText = 'S'; }
-            else if(h.score >= 80) { rankClass = 'rank-a'; rankText = 'A'; }
-            else if(h.score >= 60) { rankClass = 'rank-b'; rankText = 'B'; }
-            
-            return `
-            <tr>
-                <td>${h.date}</td>
-                <td>${h.mode}題</td>
-                <td style="font-weight:bold;">${h.score}分 <span class="${rankClass}">(${rankText})</span></td>
-            </tr>`;
-        }).join('');
-    }
+    historyList.innerHTML = quizHistory.slice().reverse().slice(0, 5).map(h => `
+        <tr><td>${h.date}</td><td>${h.type}</td><td>${h.score}%</td></tr>
+    `).join('') || '<tr><td colspan="3">尚無紀錄</td></tr>';
 }
 
 function startQuiz() {
-    quizStartTime = Date.now();
-    
-    // 取得題數設定
+    currentMode = document.getElementById('quiz-mode').value;
     const qCount = parseInt(document.getElementById('question-count').value);
-    const pool = completeData;
-    const actualCount = Math.min(qCount, pool.length);
+    currentQuiz = [...completeData].sort(() => 0.5 - Math.random()).slice(0, qCount);
     
-    // 抽題
-    currentQuiz = pool.sort(() => 0.5 - Math.random()).slice(0, actualCount);
-    document.getElementById('total-q-num').innerText = actualCount;
-
     const container = document.getElementById('questions-container');
     container.innerHTML = '';
     
     currentQuiz.forEach((q, index) => {
         const card = document.createElement('div');
         card.className = 'question-card';
+        card.id = `q-card-${index}`;
         card.innerHTML = `
-            <div class="question-text">:: 題目參數_0${index + 1} :: <br>${q.q}</div>
-            <div class="options">
+            <div style="margin-bottom:15px; color: var(--neon-cyan);">[序號: ${index + 1}]</div>
+            <div style="font-size: 1.2em; margin-bottom: 20px;">${q.q}</div>
+            <div class="options" id="options-${index}">
                 ${q.o.map((opt, optIndex) => `
-                    <label onclick="selectOption(this)">
+                    <label id="label-${index}-${optIndex}" onclick="handleSelection(${index}, ${optIndex})">
                         <input type="radio" name="q${index}" value="${optIndex}">
                         <span>${opt}</span>
                     </label>
                 `).join('')}
+            </div>
+            <div id="explanation-${index}" class="explanation-box">
+                <div style="color: var(--success); font-weight: bold; margin-bottom: 5px;">>> 數據解析：</div>
+                ${q.desc || "無額外解析內容。"}
             </div>
         `;
         container.appendChild(card);
@@ -716,129 +512,113 @@ function startQuiz() {
 
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('quiz-screen').classList.remove('hidden');
+    document.getElementById('quiz-timer').style.display = 'block';
     
-    // 啟動計時器
-    const timerEl = document.getElementById('quiz-timer');
-    timerEl.style.display = 'block';
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-        const diff = Math.floor((Date.now() - quizStartTime) / 1000);
-        const m = Math.floor(diff / 60).toString().padStart(2, '0');
-        const s = (diff % 60).toString().padStart(2, '0');
-        timerEl.innerText = `${m}:${s}`;
-    }, 1000);
-
+    quizStartTime = Date.now();
+    timerInterval = setInterval(updateTimer, 1000);
     updateProgress();
-    window.scrollTo(0, 0);
 }
 
-function selectOption(label) {
-    const allLabels = label.parentElement.querySelectorAll('label');
-    allLabels.forEach(l => l.classList.remove('selected'));
-    label.classList.add('selected');
-    setTimeout(updateProgress, 50);
+function handleSelection(qIdx, optIdx) {
+    const labels = document.querySelectorAll(`#options-${qIdx} label`);
+    
+    // 如果是即時練習模式
+    if (currentMode === "PRACTICE") {
+        // 檢查是否已鎖定
+        if (labels[0].classList.contains('locked')) return;
+
+        const correctIdx = currentQuiz[qIdx].a;
+        
+        // 鎖定所有選項
+        labels.forEach((l, i) => {
+            l.classList.add('locked');
+            l.style.cursor = 'default';
+            if (i === correctIdx) {
+                l.classList.add('correct-instant');
+            } else if (i === optIdx) {
+                l.classList.add('wrong-instant');
+            }
+        });
+
+        // 顯示解析
+        document.getElementById(`explanation-${qIdx}`).style.display = 'block';
+        
+        // 紀錄錯題
+        if (optIdx !== correctIdx) {
+            missedStats[currentQuiz[qIdx].q] = (missedStats[currentQuiz[qIdx].q] || 0) + 1;
+        }
+    } else {
+        // 標準模式：僅處理 UI 選取狀態
+        labels.forEach(l => l.classList.remove('selected'));
+        document.getElementById(`label-${qIdx}-${optIdx}`).classList.add('selected');
+    }
+    
+    // 選取 Radio (隱藏的)
+    document.querySelector(`input[name="q${qIdx}"][value="${optIdx}"]`).checked = true;
+    updateProgress();
 }
 
 function updateProgress() {
+    const answered = document.querySelectorAll('input[type="radio"]:checked').length;
     const total = currentQuiz.length;
-    let answered = 0;
-    currentQuiz.forEach((_, i) => {
-        if(document.querySelector(`input[name="q${i}"]:checked`)) answered++;
-    });
-    const percentage = (answered / total) * 100;
-    document.getElementById('progress-bar').style.width = `${percentage}%`;
-    document.getElementById('progress-num').innerText = answered;
+    document.getElementById('progress-bar').style.width = `${(answered / total) * 100}%`;
+    document.getElementById('progress-text').innerText = `系統掃描中... ${answered} / ${total}`;
+}
+
+function updateTimer() {
+    const diff = Math.floor((Date.now() - quizStartTime) / 1000);
+    const m = Math.floor(diff / 60).toString().padStart(2, '0');
+    const s = (diff % 60).toString().padStart(2, '0');
+    document.getElementById('quiz-timer').innerText = `${m}:${s}`;
 }
 
 function submitQuiz() {
     clearInterval(timerInterval);
-    document.getElementById('quiz-timer').style.display = 'none';
+    let score = 0;
+    const review = document.getElementById('wrong-answers-review');
+    review.innerHTML = '<h3 style="color:var(--danger); border-bottom:1px solid var(--danger);">[ 異常數據複查 ]</h3>';
 
-    // 計算時間
-    const timeDiff = Math.floor((Date.now() - quizStartTime) / 1000);
-    const minutes = Math.floor(timeDiff / 60);
-    const seconds = timeDiff % 60;
-    const timeString = `${minutes} 分 ${seconds} 秒`;
-
-    // 計算分數
-    let rawScore = 0;
-    const reviewContainer = document.getElementById('wrong-answers-review');
-    reviewContainer.innerHTML = '<h3 style="color:var(--danger); border-bottom:1px solid var(--danger); padding-bottom:10px;">[ 錯誤數據分析報告 ]</h3>';
-    
-    let hasWrongAnswers = false;
-
-    currentQuiz.forEach((q, index) => {
-        const selected = document.querySelector(`input[name="q${index}"]:checked`);
-        const userAnswer = selected ? parseInt(selected.value) : null;
+    currentQuiz.forEach((q, i) => {
+        const sel = document.querySelector(`input[name="q${i}"]:checked`);
+        const userAns = sel ? parseInt(sel.value) : null;
         
-        if (userAnswer === q.a) {
-            rawScore++;
+        if (userAns === q.a) {
+            score++;
         } else {
-            hasWrongAnswers = true;
-            missedStats[q.q] = (missedStats[q.q] || 0) + 1;
-            
+            // 在 EXAM 模式下這時候才紀錄錯題
+            if (currentMode === "EXAM") {
+                missedStats[q.q] = (missedStats[q.q] || 0) + 1;
+            }
             const div = document.createElement('div');
-            div.className = 'result-item wrong';
+            div.style.padding = '15px';
+            div.style.background = 'rgba(255,0,0,0.05)';
+            div.style.marginBottom = '10px';
             div.innerHTML = `
-                <div style="font-weight:bold; color:#fff;">:: 錯誤項目_Q${index + 1} :: ${q.q}</div>
-                <div style="margin:5px 0; color:var(--danger);">您的輸入: ${userAnswer !== null ? q.o[userAnswer] : '未作答 (NULL)'}</div>
-                <div class="correct-ans-display">正確參數: ${q.o[q.a]}</div>
-                <div class="explanation">解析數據: ${q.desc ? q.desc : '無額外解析資料。'}</div>
+                <div style="font-weight:bold;">${q.q}</div>
+                <div style="color:var(--danger);">您的回答: ${userAns !== null ? q.o[userAns] : "未作答"}</div>
+                <div style="color:var(--success);">正確參數: ${q.o[q.a]}</div>
             `;
-            reviewContainer.appendChild(div);
+            review.appendChild(div);
         }
     });
 
-    if (!hasWrongAnswers) {
-        reviewContainer.innerHTML += `
-            <div style="text-align:center; padding:20px; color:var(--success); border:1px solid var(--success);">
-                <h3>>> 任務完美達成 <<</h3>
-                <p>無任何錯誤數據。</p>
-            </div>`;
-    }
-
-    const totalQuestions = currentQuiz.length;
-    const percentageScore = totalQuestions > 0 ? Math.round((rawScore / totalQuestions) * 100) : 0;
-
-    // 儲存歷史紀錄
-    const now = new Date();
-    const dateStr = `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+    const finalScore = Math.round((score / currentQuiz.length) * 100);
     
+    // 儲存紀錄
     quizHistory.push({
-        date: dateStr,
-        mode: totalQuestions,
-        score: percentageScore
+        date: new Date().toLocaleDateString(),
+        type: currentMode,
+        score: finalScore
     });
     localStorage.setItem('quizHistory', JSON.stringify(quizHistory));
     localStorage.setItem('missedStats', JSON.stringify(missedStats));
-    
-    // 顯示結果
-    document.getElementById('score-display').innerHTML = `${percentageScore} <span style="font-size:0.4em;">%</span>`;
-    document.getElementById('score-detail-text').innerText = `命中率: ${rawScore} / ${totalQuestions} 題`;
-    document.getElementById('time-display').innerText = `任務耗時: ${timeString}`;
-    
+
+    document.getElementById('score-display').innerText = `${finalScore}%`;
+    document.getElementById('score-detail-text').innerText = `成功率: ${score} / ${currentQuiz.length}`;
     document.getElementById('quiz-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
-    window.scrollTo(0, 0);
-}
-
-function resetMissedStats() {
-    if(confirm('警告：確定清除錯題統計數據？')) {
-        localStorage.removeItem('missedStats');
-        missedStats = {};
-        updateStatsDisplay();
-    }
-}
-
-function clearHistory() {
-    if(confirm('警告：確定刪除所有歷史戰績？此操作無法復原。')) {
-        localStorage.removeItem('quizHistory');
-        quizHistory = [];
-        updateStatsDisplay();
-    }
+    document.getElementById('quiz-timer').style.display = 'none';
 }
 </script>
-
 </body>
 </html>
-
